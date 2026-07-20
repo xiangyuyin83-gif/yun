@@ -1,0 +1,4 @@
+loadfile empty_yun.out
+r
+g
+exit

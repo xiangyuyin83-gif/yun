@@ -1,0 +1,54 @@
+/*********************************************************************
+* J-Link script for MSPM0G3507 with OLink (J-Link-OB STM32F103 2012 firmware)
+*
+* Purpose: Prevent the J-Link DLL from attempting MSPM0-specific mass
+* erase / factory reset operations that the old OLink firmware cannot
+* execute. These operations require J-Link firmware features added
+* after 2012.
+*
+* The DLL detects a "secured" MSPM0 via SECAP and writes registry key
+* DontShowAgainUnlockMSPM0=1, then auto-attempts mass erase. This fails
+* on OLink. By handling all target init steps ourselves and reporting
+* success, we prevent the DLL from entering that code path.
+*********************************************************************/
+
+int InitTarget(void) {
+    //
+    // Skip MSPM0-specific SECAP/PWRAP/CFGAP init.
+    // The DLL's standard Cortex-M CoreSight discovery handles the rest.
+    //
+    return 0;
+}
+
+int SetupTarget(void) {
+    //
+    // Called after InitTarget. Return 0 to tell DLL setup is complete.
+    // Prevents DLL from running its own MSPM0 post-init checks.
+    //
+    return 0;
+}
+
+int ResetTarget(void) {
+    //
+    // Use standard Cortex-M reset (AIRCR.SYSRESETREQ)
+    // MSPM0-specific reset via SECAP is not supported by old firmware.
+    //
+    return 0;
+}
+
+int OnConnectTarget(void) {
+    //
+    // Connection already established by standard CoreSight flow.
+    // Return 0 to prevent DLL from doing additional MSPM0 security checks.
+    //
+    return 0;
+}
+
+int OnDisconnectTarget(void) {
+    //
+    // Clean disconnect: reset and halt to leave chip in known state.
+    //
+    JLINK_Reset();
+    JLINK_Sleep(5);
+    return 0;
+}

@@ -1,0 +1,21 @@
+r
+g
+sleep 100
+halt
+mem32 0x400A12C0 1
+mem32 0x400A32C0 1
+mem32 0x400A1280 1
+mem32 0x400A3280 1
+sleep 500
+halt
+mem32 0x400A1280 1
+mem32 0x400A3280 1
+sleep 500
+halt
+mem32 0x400A1280 1
+mem32 0x400A3280 1
+sleep 500
+halt
+mem32 0x400A1280 1
+mem32 0x400A3280 1
+exit

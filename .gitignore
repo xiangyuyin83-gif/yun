@@ -1,0 +1,50 @@
+<<<<<<< HEAD
+# CCS build outputs
+/Debug/
+.settings/
+*.out
+*.map
+*.hex
+*.bin
+*.linkInfo.xml
+
+# IDE
+.idea/
+.vscode/
+*.ccsproject
+*.cproject
+*.project
+*.launch
+
+# OS
+Thumbs.db
+Desktop.ini
+=======
+# Build outputs
+empty_yun/Debug/*.o
+empty_yun/Debug/*.d
+empty_yun/Debug/*.d_raw
+empty_yun/Debug/*.map
+empty_yun/Debug/*.out
+empty_yun/Debug/*.opt
+empty_yun/Debug/*.genlibs
+empty_yun/Debug/*.linker.cmd
+empty_yun/Debug/*.linker.lds
+empty_yun/Debug/*_linkInfo.xml
+empty_yun/Debug/Event.dot
+empty_yun/Debug/makefile
+empty_yun/Debug/objects.mk
+empty_yun/Debug/sources.mk
+empty_yun/Debug/subdir_rules.mk
+empty_yun/Debug/subdir_vars.mk
+empty_yun/Debug/true
+empty_yun/Debug/ccsObjs.opt
+empty_yun/Debug/.clangd/
+empty_yun/Debug/flash_test.jlink
+empty_yun/Debug/verify.jlink
+
+# IDE
+.theia/
+.codex/
+.settings/
+>>>>>>> 683b433bbbbc1dfac2c91c124882579c63497f64
