@@ -208,9 +208,9 @@ int main(void)
             if (!data_confirmed) {
                 TrackerCoord c = tracker_get_coord();
                 if (c.fresh) {
-                    data_confirmed = true;
-                    step_motor_move(STEP_MOTOR_A, STEP_DIR_CW,  50, 400);
-                    step_motor_move(STEP_MOTOR_A, STEP_DIR_CCW, 50, 400);
+                    /*data_confirmed = true;
+                    /*step_motor_move(STEP_MOTOR_A, STEP_DIR_CW,  50, 400);
+                    step_motor_move(STEP_MOTOR_A, STEP_DIR_CCW, 50, 400);*/
                     /* 抖动后电机 A 回到 tracker 控制 */
                 }
             }
