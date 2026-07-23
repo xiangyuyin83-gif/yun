@@ -80,13 +80,31 @@ int main(void)
     /* ===== 1. 平台初始化 ===== */
     SYSCFG_DL_init();
 
-    /* 关闭 SysConfig 默认的 UART 回环模式:
-     *   先禁能 UART → 清除 LBE 位 → 重新使能 → 显式使能 TX 引脚输出
-     *   (LBE 位在 UART 运行时可能锁存, 禁能后清除最可靠) */
+    /*
+     * 关闭 SysConfig 默认打开的 UART 回环模式 (Loopback Mode).
+     *
+     * 回环模式是做什么的:
+     *   TX 和 RX 在芯片内部短路 —— 自己发的数据自己收, 外界信号断开.
+     *   这是出厂自检用的, 正常工作必须关掉, 否则收不到 K230 发来的坐标.
+     *
+     * 为什么要先禁能再操作:
+     *   LBE 位在 UART 运行时处于锁存状态, 直接写可能不生效,
+     *   先禁能 → 改寄存器 → 重新使能 是最可靠的做法.
+     */
+
+    /* ① 暂停 UART 模块, 改配置前必须先停 */
     DL_UART_Main_disable(UART_0_INST);
+
+    /* ② 直接操作寄存器清除 LBE (Loop Back Enable) 位, 关掉内部回环 */
     UART_0_INST->CTL0 &= ~UART_CTL0_LBE_MASK;
+
+    /* ③ 用 TI 驱动库 API 正式禁用回环模式 (清相关状态位) */
     DL_UART_Main_disableLoopbackMode(UART_0_INST);
+
+    /* ④ UART 重新上电运行, 此时 TX/RX 已接到外部引脚 */
     DL_UART_Main_enable(UART_0_INST);
+
+    /* ⑤ TX 引脚默认可能是高阻输入态, 显式设为输出才能往外推信号 */
     DL_GPIO_enableOutput(GPIO_UART_0_TX_PORT, GPIO_UART_0_TX_PIN);
 
     step_motor_init();
@@ -221,6 +239,12 @@ int main(void)
             stabilizer_update(&stab);
             debug_heartbeat();
 #endif
+            /*
+             * 主循环节拍: 10µs 延时防止裸奔占满 CPU.
+             * tracker_update() 实际耗时约 20~50µs (UART 轮询 + PWM 更新 + 回传),
+             * 加上此延时, 每圈约 30~60µs → 实际循环频率约 15~30kHz.
+             * 串口 115200 baud 每帧约 2.6ms, 循环远快于帧率, 不会丢数据.
+             */
             delay_us(10);
         }
     }

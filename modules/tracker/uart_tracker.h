@@ -43,11 +43,11 @@ typedef struct {
 
 /* 默认配置 */
 #define TRACKER_DEFAULT_CONFIG {  \
-    .dead_zone_x = 15,             \
-    .dead_zone_y = 15,             \
+    .dead_zone_x = 5,             \
+    .dead_zone_y = 5,             \
     .kp_x        = 0.1f,           \
-    .kp_y        = 0.1f,           \
-    .min_freq    = 0,             \
+    .kp_y        = 0.1f,     /*下*/   \  
+    .min_freq    = 20,             \
     .max_freq    = 100,          \
     .timeout_ms  = 1000000         \
 }
