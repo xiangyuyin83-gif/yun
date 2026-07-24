@@ -339,17 +339,19 @@ static void motor_compute(int32_t error, int32_t dead_zone,
 
     /* ③ 超出死区的部分 = 真正需要转动的距离 */
     int32_t effective = abs_err - dead_zone;
-    /* 例: error=30, dead_zone=15 → effective = 15 */
+    if (effective <= 0) {
+        *out_dir  = -1;
+        *out_freq = 0;
+        return;
+    }
 
-    /* ④ 比例公式: 超出死区越多 → 转得越快
-     *    +0.5f 实现四舍五入, 替代 (int32_t) 截断, 消除"第二死区".
-     *    例: kp=0.1, effective=8 → 0.1×8=0.8 → 截断=0(✗), 四舍五入=1(✓) */
-    int32_t freq = min_freq + (int32_t)(kp * effective + 0.5f);
-    /* 例: min_freq=0, kp=0.4, effective=15 → 0 + (0.4×15+0.5) = 0 + 6.5 = 6 Hz */
+    /* ④ 比例公式: 从 0 开始线性加速, 不加 min_freq.
+     *    +0.5f 四舍五入, 消除整数截断造成的"第二死区" */
+    int32_t freq = min_freq + (int32_t)(kp * abs_err);
 
-    /* ⑤ 限幅: 频率不能超出 [min_freq, max_freq] 范围 */
-    if (freq > max_freq) freq = max_freq;    /* 上限: 防止飞车 */
-    if (freq < min_freq) freq = min_freq;    /* 下限: 低于此值电机没力 */
+    /* ⑤ 限幅: 上限 max_freq, 下限 0 (死区内已直接返回 0) */
+    if (freq > max_freq) freq = max_freq;
+    if (freq <= min_freq)   freq = 0;
 
     *out_freq = freq;
 
